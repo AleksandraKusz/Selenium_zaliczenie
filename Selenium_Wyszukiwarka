@@ -1,0 +1,48 @@
+#Zaimportowanie biblioteki Selenium
+import unittest #Zaimportowanie biblioteki Unittest.
+from selenium import webdriver #Zapewnia wszytskie implementacje WebDriver.
+from selenium.webdriver.common.by import By #Klasa By służy do lokalizowania elementów.
+
+
+class TestWyszukiwarki(unittest.TestCase): #Klasa
+    def setUp(self): #Metoda setUp uruchamia się zawsze przed każdym testem
+        self.driver: WebDriver = webdriver.Chrome("C:\Testcase\chromedriver.exe")
+
+        #Przekierowanie na stronę www
+        self.driver.get("http://automationpractice.pl/index.php")
+
+        # Maksymalizuje przeglądarkę.
+        self.driver.maximize_window()
+
+        #Czekanie na elementy, metoda bezwarunkowa.
+        self.driver.implicitly_wait(5)
+
+    def tearDown(self): #Metoda tearDown urochamia się zawsze po zakończeniu testu.
+        self.driver.close()
+
+    def test_homePageTitle(self): #Unittest posiada funkcję autowykrywania testów,
+                                    # któych nazwa zaczyna się od prefiksu test.
+
+        self.assertEqual("My Store", self.driver.title, "Tytuł strony różni się")
+
+    def test_wyszukiwarki(self):
+        # Wpisuje słowo "Dress" w pole wyszukiwania.
+        self.driver.find_element(By.NAME, "search_query").send_keys("Dress")
+        # Klika na lupę w celu przejścia do strony wyszukiwania.
+        self.driver.find_element(By.NAME, "submit_search").click()
+        self.assertEqual("Search - My Store", self.driver.title, "Tytuł strony różni się")
+
+
+    def test_listyWyszukiwania(self):
+        self.driver.find_element(By.ID, 'search_query_top').send_keys('Dress')
+        self.driver.find_element(By.NAME, 'submit_search').click()
+
+        dress = self.driver.find_elements(By.CLASS_NAME, 'product-name')
+        liczba_sukienek = self.driver.find_elements(By.PARTIAL_LINK_TEXT, "Dress")
+        self.assertEqual(len(liczba_sukienek), len(dress), 'Wyszukiwarka nie działa poprawnie.')
+
+
+
+#Uruchomienie wszystkich testó jednostkowych.
+if __name__ == "__main__":
+    unittest.main()
